@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}{{ purchase.name }}{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <div>
+        <h1>📥 {{ purchase.name }}</h1>
+        <p class="muted">{% if purchase.phone %}{{ purchase.phone }}{% endif %}{% if purchase.phone and purchase.address
+            %} · {% endif %}{{ purchase.address }}</p>
+    </div>
+    <form action="{{ url_for('delete_purchase', purchase_id=purchase.id) }}" method="post"
+        onsubmit="return confirm('Delete this purchase and all its records?')">
+        <button type="submit" class="btn-ghost">Delete purchase</button>
+    </form>
+</section>
+
+<section class="cards">
+    <div class="card stat">
+        <span class="card-label">Total purchased</span>
+        <span class="card-value">₹{{ "%.2f"|format(total_purchased) }}</span>
+    </div>
+    <div class="card stat due-pay">
+        <span class="card-label">You still owe them</span>
+        <span class="card-value danger-text">₹{{ "%.2f"|format(total_due) }}</span>
+    </div>
+</section>
+
+<div class="grid">
+    <section class="card">
+        <h2>➕ New purchase</h2>
+        <form action="{{ url_for('add_purchase_record') }}" method="post" class="expense-form">
+            <input type="hidden" name="purchase_id" value="{{ purchase.id }}" />
+            <label>Item
+                <input type="text" name="item" required maxlength="100" placeholder="e.g. Rice 50kg bag" />
+            </label>
+            <div class="row2">
+                <label>Quantity
+                    <input type="number" name="quantity" step="0.01" min="0.01" value="1" required />
+                </label>
+                <label>Amount (₹)
+                    <input type="number" name="amount" step="0.01" min="0.01" required placeholder="0.00" />
+                </label>
+            </div>
+            <div class="row2">
+                <label>Paid now (₹)
+                    <input type="number" name="paid" step="0.01" min="0" value="0" placeholder="0.00" />
+                </label>
+                <label>Date
+                    <input type="date" name="date" value="{{ today }}" required />
+                </label>
+            </div>
+            <button type="submit" class="btn-primary">Record purchase ✨</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>🧾 Purchase history</h2>
+        {% if records %}
+        <div class="expense-list">
+            {% for r in records %}
+            <div class="expense-row">
+                <div class="expense-main">
+                    <span class="expense-title">{{ r.item }} <span class="muted small">× {{ r.quantity }}</span></span>
+                    <span class="muted small">{{ r.date }} · paid ₹{{ "%.2f"|format(r.paid) }} / ₹{{
+                        "%.2f"|format(r.amount) }}</span>
+                </div>
+                {% if r.amount - r.paid > 0 %}
+                <span class="badge badge-due">owe ₹{{ "%.2f"|format(r.amount - r.paid) }}</span>
+                <form action="{{ url_for('pay_purchase_record', record_id=r.id) }}" method="post" class="pay-form">
+                    <input type="number" name="pay" step="0.01" min="0.01" max="{{ r.amount - r.paid }}" placeholder="₹"
+                        required />
+                    <button type="submit" class="btn-primary btn-small">Paid</button>
+                </form>
+                {% else %}
+                <span class="badge badge-clear">paid ✓</span>
+                {% endif %}
+                <form action="{{ url_for('delete_purchase_record', record_id=r.id) }}" method="post">
+                    <button type="submit" class="danger" title="Delete">✕</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty">No purchases here yet. Record the first one 👆</p>
+        {% endif %}
+    </section>
+</div>
+
+{% endblock %}

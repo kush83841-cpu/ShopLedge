@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Customers{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <div>
+        <h1>👥 Customers</h1>
+        <p class="muted">Everyone who buys from you</p>
+    </div>
+</section>
+
+<div class="grid">
+    <section class="card">
+        <h2>➕ Add customer</h2>
+        <form action="{{ url_for('add_customer') }}" method="post" class="expense-form">
+            <label>Name
+                <input type="text" name="name" required maxlength="80" placeholder="e.g. Ramesh Kumar" />
+            </label>
+            <div class="row2">
+                <label>Phone
+                    <input type="text" name="phone" maxlength="20" placeholder="e.g. 98765 43210" />
+                </label>
+                <label>Address
+                    <input type="text" name="address" maxlength="120" placeholder="(optional)" />
+                </label>
+            </div>
+            <button type="submit" class="btn-primary">Add customer ✨</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>🔍 Search</h2>
+        <form method="get" action="{{ url_for('customers') }}" class="expense-form">
+            <label>Customer name
+                <input type="text" name="q" value="{{ q }}" placeholder="Type a name..." />
+            </label>
+            <div class="filter-buttons">
+                <button type="submit" class="btn-primary">Search</button>
+                {% if q %}<a href="{{ url_for('customers') }}" class="btn-ghost">Clear</a>{% endif %}
+            </div>
+        </form>
+    </section>
+</div>
+
+<section class="card">
+    <div class="card-head">
+        <h2>📋 All customers ({{ customers|length }})</h2>
+    </div>
+    {% if customers %}
+    <div class="expense-list">
+        {% for c in customers %}
+        <a href="{{ url_for('customer_detail', customer_id=c.id) }}" class="row-link">
+            <div class="expense-row">
+                <div class="expense-main">
+                    <span class="expense-title">{{ c.name }}</span>
+                    <span class="muted small">{% if c.phone %}{{ c.phone }}{% endif %}{% if c.phone and c.address %} ·
+                        {% endif %}{{ c.address }} · {{ c.sales_count }} sale(s)</span>
+                </div>
+                {% if c.due > 0 %}
+                <span class="badge badge-due">owes ₹{{ "%.2f"|format(c.due) }}</span>
+                {% else %}
+                <span class="badge badge-clear">settled ✓</span>
+                {% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty">No customers yet. Add your first one above 👆</p>
+    {% endif %}
+</section>
+
+{% endblock %}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}ShopLedger{% endblock %} · ShopLedger</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+
+<body>
+    <div class="bg-glow"></div>
+
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="logo">📒 ShopLedger</a>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Dashboard</a>
+            <a href="{{ url_for('customers') }}"
+                class="{% if request.endpoint in ['customers', 'customer_detail'] %}active{% endif %}">Customers</a>
+            <a href="{{ url_for('purchases') }}"
+                class="{% if request.endpoint in ['purchases', 'purchase_detail'] %}active{% endif %}">Purchases</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="flash-wrap">
+            {% for m in messages %}
+            <div class="flash">{{ m }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>Made with 💜 while learning Flask</p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

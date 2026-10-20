@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <div>
+        <h1>📒 Shop Dashboard</h1>
+        <p class="muted">Your shop at a glance · {{ month }}</p>
+    </div>
+</section>
+
+<section class="cards">
+    <div class="card stat">
+        <span class="card-label">Sales · {{ month }}</span>
+        <span class="card-value gradient-text">₹{{ "%.2f"|format(sales_month) }}</span>
+    </div>
+    <div class="card stat">
+        <span class="card-label">Purchases · {{ month }}</span>
+        <span class="card-value">₹{{ "%.2f"|format(purch_month) }}</span>
+    </div>
+    <div class="card stat">
+        <span class="card-label">Profit · {{ month }}</span>
+        <span class="card-value {% if profit >= 0 %}profit-pos{% else %}profit-neg{% endif %}">₹{{ "%.2f"|format(profit)
+            }}</span>
+    </div>
+</section>
+
+<section class="cards">
+    <div class="card stat due-collect">
+        <span class="card-label">💰 To collect (customers owe you)</span>
+        <span class="card-value">₹{{ "%.2f"|format(to_collect) }}</span>
+    </div>
+    <div class="card stat due-pay">
+        <span class="card-label">🧾 To pay (you owe on purchases)</span>
+        <span class="card-value">₹{{ "%.2f"|format(to_pay) }}</span>
+    </div>
+</section>
+
+<div class="grid">
+    <section class="card">
+        <div class="card-head">
+            <h2>⚠️ Top dues to collect</h2>
+            <a href="{{ url_for('customers') }}" class="link">All customers →</a>
+        </div>
+        {% if debtors %}
+        <div class="expense-list">
+            {% for d in debtors %}
+            <a href="{{ url_for('customer_detail', customer_id=d.id) }}" class="row-link">
+                <div class="expense-row">
+                    <div class="expense-main">
+                        <span class="expense-title">{{ d.name }}</span>
+                    </div>
+                    <span class="expense-amount danger-text">₹{{ "%.2f"|format(d.due) }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty">No pending dues. Everyone's paid up! 🎉</p>
+        {% endif %}
+    </section>
+
+    <section class="card">
+        <div class="card-head">
+            <h2>🕘 Recent sales</h2>
+            <a href="{{ url_for('customers') }}" class="link">Customers →</a>
+        </div>
+        {% if recent_sales %}
+        <div class="expense-list">
+            {% for s in recent_sales %}
+            <div class="expense-row">
+                <div class="expense-main">
+                    <span class="expense-title">{{ s.item }} <span class="muted small">× {{ s.quantity }}</span></span>
+                    <span class="muted small">{{ s.customer_name }} · {{ s.date }}</span>
+                </div>
+                <span class="expense-amount">₹{{ "%.2f"|format(s.amount) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty">No sales yet. Add your first customer 👆</p>
+        {% endif %}
+    </section>
+</div>
+
+<section class="card">
+    <div class="card-head">
+        <h2>📥 Recent purchases</h2>
+        <a href="{{ url_for('purchases') }}" class="link">All purchases →</a>
+    </div>
+    {% if recent_purch %}
+    <div class="expense-list">
+        {% for p in recent_purch %}
+        <div class="expense-row">
+            <div class="expense-main">
+                <span class="expense-title">{{ p.item }} <span class="muted small">× {{ p.quantity }}</span></span>
+                <span class="muted small">{% if p.purchase_name %}{{ p.purchase_name }} · {% endif %}{{ p.date }}</span>
+            </div>
+            <span class="badge">{{ "%.0f"|format(p.paid / p.amount * 100) if p.amount else 0 }}% paid</span>
+            <span class="expense-amount">₹{{ "%.2f"|format(p.amount) }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty">No purchases recorded yet.</p>
+    {% endif %}
+</section>
+
+{% endblock %}

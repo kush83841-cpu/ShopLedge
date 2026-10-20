@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Purchases{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <div>
+        <h1>📥 Purchases</h1>
+        <p class="muted">Everyone you buy stock from</p>
+    </div>
+</section>
+
+<div class="grid">
+    <section class="card">
+        <h2>➕ Add purchase</h2>
+        <form action="{{ url_for('add_purchase') }}" method="post" class="expense-form">
+            <label>Name
+                <input type="text" name="name" required maxlength="80" placeholder="e.g. Sharma Wholesalers" />
+            </label>
+            <div class="row2">
+                <label>Phone
+                    <input type="text" name="phone" maxlength="20" placeholder="e.g. 98765 43210" />
+                </label>
+                <label>Address
+                    <input type="text" name="address" maxlength="120" placeholder="(optional)" />
+                </label>
+            </div>
+            <button type="submit" class="btn-primary">Add purchase ✨</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>🔍 Search</h2>
+        <form method="get" action="{{ url_for('purchases') }}" class="expense-form">
+            <label>Name
+                <input type="text" name="q" value="{{ q }}" placeholder="Type a name..." />
+            </label>
+            <div class="filter-buttons">
+                <button type="submit" class="btn-primary">Search</button>
+                {% if q %}<a href="{{ url_for('purchases') }}" class="btn-ghost">Clear</a>{% endif %}
+            </div>
+        </form>
+    </section>
+</div>
+
+<section class="card">
+    <div class="card-head">
+        <h2>📋 All purchases ({{ purchases|length }})</h2>
+    </div>
+    {% if purchases %}
+    <div class="expense-list">
+        {% for p in purchases %}
+        <a href="{{ url_for('purchase_detail', purchase_id=p.id) }}" class="row-link">
+            <div class="expense-row">
+                <div class="expense-main">
+                    <span class="expense-title">{{ p.name }}</span>
+                    <span class="muted small">{% if p.phone %}{{ p.phone }}{% endif %}{% if p.phone and p.address %} ·
+                        {% endif %}{{ p.address }} · {{ p.records_count }} record(s)</span>
+                </div>
+                {% if p.due > 0 %}
+                <span class="badge badge-due">you owe ₹{{ "%.2f"|format(p.due) }}</span>
+                {% else %}
+                <span class="badge badge-clear">settled ✓</span>
+                {% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty">No purchases yet. Add your first one above 👆</p>
+    {% endif %}
+</section>
+
+{% endblock %}
