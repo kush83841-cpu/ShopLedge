@@ -20,6 +20,12 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-only-change-me")
 DATABASE = os.path.join(app.instance_path, "shopledger.db")
 
 
+@app.route("/sw.js")
+def service_worker():
+    """Serve the service worker from the root so it can control the whole app."""
+    return app.send_static_file("sw.js")
+
+
 # ---------- database ----------
 
 def get_db():

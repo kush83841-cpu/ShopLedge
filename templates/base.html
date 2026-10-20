@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}ShopLedger{% endblock %} · ShopLedger</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
+    <meta name="theme-color" content="#8b5cf6" />
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon-192.png') }}" />
 </head>
 
 <body>
@@ -41,6 +44,13 @@
     </footer>
 
     {% block scripts %}{% endblock %}
+
+    <script>
+        // Register the service worker so the app is installable (PWA)
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/sw.js");
+        }
+    </script>
 </body>
 
 </html>
